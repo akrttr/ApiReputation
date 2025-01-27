@@ -1,0 +1,6 @@
+@ApiReputation_HostAddress = http://localhost:5096
+
+GET {{ApiReputation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
