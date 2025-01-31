@@ -5,11 +5,11 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReputation", "ApiReputation\ApiReputation.csproj", "{7A5292C8-3027-421C-975F-48912E53FC1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiReputation.Application", "ApiReputation.Application\ApiReputation.Application.csproj", "{20E2F2F5-7740-44FD-AC25-5F5A0CD5A6BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReputation.Application", "ApiReputation.Application\ApiReputation.Application.csproj", "{20E2F2F5-7740-44FD-AC25-5F5A0CD5A6BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiReputation.Domain", "ApiReputation.Domain\ApiReputation.Domain.csproj", "{EFEF2EAD-F91A-4393-95B2-54BF30F9EFA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReputation.Domain", "ApiReputation.Domain\ApiReputation.Domain.csproj", "{EFEF2EAD-F91A-4393-95B2-54BF30F9EFA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiReputation.Infrastructure", "ApiReputation.Infrastructure\ApiReputation.Infrastructure.csproj", "{95DE593D-084E-40E7-80AB-3D2C01DDFF40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiReputation.Infrastructure", "ApiReputation.Infrastructure\ApiReputation.Infrastructure.csproj", "{95DE593D-084E-40E7-80AB-3D2C01DDFF40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
