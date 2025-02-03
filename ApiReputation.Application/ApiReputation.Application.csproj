@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApiReputation.Domain\ApiReputation.Domain.csproj" />
+    <ProjectReference Include="..\ApiReputation.Infrastructure\ApiReputation.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
