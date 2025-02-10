@@ -1,7 +1,12 @@
-﻿namespace ApiReputation.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace ApiReputation.Domain.Entities
 {
     public class ApiInfo
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
         public string? Category { get; set; }
