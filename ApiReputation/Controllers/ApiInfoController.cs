@@ -41,18 +41,33 @@ namespace ApiReputation.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, [FromBody] ApiInfo api)
+        public async Task<IActionResult> Update(int id, [FromBody] ApiInfo api)
         {
-            if (api == null) return BadRequest();
+            if (id != api.Id)
+                return BadRequest("ID uyumsuzluğu!");
+
             await _apiService.UpdateApiAsync(api);
             return NoContent();
         }
 
+
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _apiService.DeleteApiAsync(id);
-            return NoContent();
+            try
+            {
+                await _apiService.DeleteApiAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Bir hata oluştu.", error = ex.Message });
+            }
         }
+
     }
 }
