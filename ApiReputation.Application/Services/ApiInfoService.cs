@@ -20,7 +20,18 @@ namespace ApiReputation.Application.Services
 
 
         public async Task<IEnumerable<ApiInfo>> GetAllApiAsync() => await _repository.GetAllAsync();
-        public async Task<ApiInfo> GetApiByIdAsync(int id) => await _repository.GetByIdAsync(id);
+       // public async Task<ApiInfo> GetApiByIdAsync(int id) => await _repository.GetByIdAsync(id);
+
+        public async Task<ApiInfo> GetApiByIdAsync(int id)
+        {
+           
+            var api = await _repository.GetByIdAsync(id);
+            if (api == null)
+                throw new KeyNotFoundException("API bulunamadı.");
+
+            return api;
+        }
+
         public async Task AddApiAsync(ApiInfo api) => await _repository.AddAsync(api);
         public async Task DeleteApiAsync(int id)
         {
