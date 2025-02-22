@@ -30,7 +30,8 @@ public class AuthController : ControllerBase
     private string GenerateJwtToken(string username)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
+        var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
 
         var claims = new[]
         {

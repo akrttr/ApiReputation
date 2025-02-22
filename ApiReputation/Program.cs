@@ -47,8 +47,8 @@ builder.Services.AddCors(options =>
 
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
-
+// var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]); 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -81,6 +81,9 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+
+
+// IdentityModelEventSource.ShowPII = true;
 // Controllers and Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
