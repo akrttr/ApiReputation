@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
+using AspNetCoreRateLimit;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,8 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console() // Konsola yaz
     .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day) // Günlük logları dosyaya kaydet
     .CreateLogger();
+
+
 
 builder.Host.UseSerilog();
 
@@ -44,6 +47,16 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+
+
+
+// Rate Limiting Konfigürasyonu
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("RateLimitOptions"));
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddMemoryCache();
+builder.Services.AddInMemoryRateLimiting();
 
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -120,19 +133,21 @@ var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseCors(corsPolicy);
 
 app.UseHttpsRedirection();
-
+app.UseIpRateLimiting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<LoggingMiddleware>();
 app.UseSerilogRequestLogging();
 
 app.MapControllers();
