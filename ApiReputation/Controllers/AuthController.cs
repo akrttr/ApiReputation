@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, "Admin")
+            new Claim(ClaimTypes.Role, username == "admin" ? "Admin" : "User")
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor

@@ -34,7 +34,7 @@ namespace ApiReputation.Controllers
             if (api == null)  return NotFound();
             return Ok(api);
         }
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost("Add")]
         public async Task<ActionResult> Add([FromBody] ApiInfo api)
         {
@@ -42,7 +42,7 @@ namespace ApiReputation.Controllers
             return CreatedAtAction(nameof(GetById), new { id = api.Id }, api);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ApiInfo api)
         {
@@ -53,7 +53,7 @@ namespace ApiReputation.Controllers
             return NoContent();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
