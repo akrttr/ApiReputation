@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Serilog;
+using System.Net;
 using System.Text.Json;
 
 namespace ApiReputation.Middlewares
@@ -6,15 +7,13 @@ namespace ApiReputation.Middlewares
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(RequestDelegate next)
         {
             _next = next;
-            _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task Invoke(HttpContext context)
         {
             try
             {
@@ -22,24 +21,27 @@ namespace ApiReputation.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Beklenmeyen bir hata oluştu: {ex}");
+                Log.Error("🔥 Exception: {Message} | Path: {Path} | User: {User}",
+                    ex.Message, context.Request.Path, context.User.Identity.Name);
+
                 await HandleExceptionAsync(context, ex);
             }
         }
 
         private static Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
             var response = new
             {
-                statusCode = context.Response.StatusCode,
+                statusCode = (int)HttpStatusCode.InternalServerError,
                 message = "Sunucuda bir hata oluştu.",
                 details = exception.Message
             };
 
-            return context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            var jsonResponse = JsonSerializer.Serialize(response);
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            return context.Response.WriteAsync(jsonResponse);
         }
     }
 }
