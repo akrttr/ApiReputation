@@ -13,5 +13,6 @@ namespace ApiReputation.Infrastructure.Contexts
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<ApiInfo> ApiInfos { get; set; }
+        public DbSet<ScanResult> ScanResults { get; set; }
     }
 }

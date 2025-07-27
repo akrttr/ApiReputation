@@ -1,6 +1,5 @@
-﻿using ApiReputation.Domain.Entities;
-using ApiReputation.Infrastructure.Repositories;
-using Microsoft.Identity.Client;
+﻿using ApiReputation.Application.Repositories;
+using ApiReputation.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

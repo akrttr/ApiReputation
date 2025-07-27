@@ -1,4 +1,5 @@
-﻿using ApiReputation.Application.Services;
+﻿using ApiReputation.Application.Interfaces;
+using ApiReputation.Application.Services;
 using ApiReputation.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,6 +15,8 @@ namespace ApiReputation.Controllers
     public class ApiInfoController : ControllerBase
     {
         private readonly ApiInfoService _apiService;
+        private readonly IScannerService _scannerService;
+
 
         public ApiInfoController(ApiInfoService apiService)
         {
@@ -72,5 +75,32 @@ namespace ApiReputation.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{id}/scan")]
+        public async Task<IActionResult> ScanApiInfo(int id)
+        {
+            // Not: UnitOfWork ve Repository desenini tam olarak kurduysak,
+            // kullanıcı kontrolünü burada yapmak daha doğru olur.
+            // Şimdilik servisin bu kontrolü yaptığını varsayıyoruz.
+
+            try
+            {
+                // Servisimizi çağırarak tüm işi ona yaptırıyoruz.
+                var scanResult = await _scannerService.PerformScanAsync(id);
+
+                // Başarılı olursa, tarama sonucunu direkt olarak kullanıcıya dönüyoruz.
+                return Ok(scanResult);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Servis "ApiInfo not found" hatası fırlatırsa, 404 Not Found dönüyoruz.
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Beklenmedik başka bir hata olursa 400 Bad Request dönüyoruz.
+                return BadRequest(new { message = $"An error occurred during the scan: {ex.Message}" });
+            }
+        }
     }
 }

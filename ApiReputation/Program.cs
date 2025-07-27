@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
 using AspNetCoreRateLimit;
+using ApiReputation.Application.Repositories;
+using ApiReputation.Application.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +39,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Dependency Injection
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ApiInfoService>();
+builder.Services.AddScoped<IUnitofWork, UnitofWork>();
 var corsPolicy = "AllowAll";
 builder.Services.AddCors(options =>
 {

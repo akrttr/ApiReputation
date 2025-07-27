@@ -1,4 +1,5 @@
-﻿using ApiReputation.Infrastructure.Contexts;
+﻿using ApiReputation.Application.Repositories;
+using ApiReputation.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
