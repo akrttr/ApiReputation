@@ -40,6 +40,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ApiInfoService>();
 builder.Services.AddScoped<IUnitofWork, UnitofWork>();
+builder.Services.AddScoped<IScannerService, ScannerService>();
+
+
+builder.Services.AddHttpClient();
+
+
+
+
 var corsPolicy = "AllowAll";
 builder.Services.AddCors(options =>
 {

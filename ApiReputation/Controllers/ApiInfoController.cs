@@ -18,9 +18,10 @@ namespace ApiReputation.Controllers
         private readonly IScannerService _scannerService;
 
 
-        public ApiInfoController(ApiInfoService apiService)
+        public ApiInfoController(ApiInfoService apiService, IScannerService scannerService )
         {
             _apiService = apiService;
+            _scannerService = scannerService;
         }
 
         [HttpGet("List")]
@@ -56,7 +57,6 @@ namespace ApiReputation.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -75,7 +75,6 @@ namespace ApiReputation.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost("{id}/scan")]
         public async Task<IActionResult> ScanApiInfo(int id)
         {
