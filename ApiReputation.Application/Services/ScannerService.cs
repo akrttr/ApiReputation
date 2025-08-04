@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Security;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace ApiReputation.Application.Services
         {
             var apiInfo = await _unitOfWork.ApiInfoRepository.GetByIdAsync(apiInfoId);
             if (apiInfo == null)
-                
+
             {
                 throw new KeyNotFoundException($"Api with ID {apiInfoId} not found!");
             }
@@ -33,22 +34,26 @@ namespace ApiReputation.Application.Services
             var result = new ScanResult
             {
                 ApiInfoId = apiInfoId,
-                ScanDate = DateTime.Now,
+                ScanDate = DateTime.UtcNow,
             };
 
             var client = _httpClientFactory.CreateClient();
-
+            var stopwatch = new Stopwatch();
             try
             {
-                // === ANA HTTP İSTEĞİ ===
-                // Tüm kontrolleri bu tek isteğin yanıtı üzerinden yapacağız.
+                stopwatch.Start();
                 var response = await client.GetAsync(apiInfo.BaseUrl);
+                stopwatch.Stop();
+
+                result.ResponseTimeMs = (int)stopwatch.ElapsedMilliseconds;
+                result.IsSuccessStatusCode = response.IsSuccessStatusCode;
+                result.HttpStatusCode = (int)response.StatusCode;
+
 
                 result.HasHstsHeader = response.Headers.Contains("Strict-Transport-Security");
                 result.HasXFrameOptionsHeader = response.Headers.Contains("X-Frame-Options");
                 result.HasXContentTypeOptionsHeader = response.Headers.Contains("X-Content-Type-Options");
 
-                // === BİLGİ SIZINTISI KONTROLÜ ===
                 string serverLeak = "";
                 if (response.Headers.TryGetValues("Server", out var serverValues))
                 {
@@ -59,10 +64,6 @@ namespace ApiReputation.Application.Services
                     serverLeak += $"X-Powered-By: {string.Join(", ", poweredByValues)}";
                 }
                 result.ServerInfoLeakDetails = string.IsNullOrEmpty(serverLeak) ? "No obvious leaks found." : serverLeak;
-
-                // === SSL SERTİFİKASI KONTROLÜ ===
-                // Bu basit kontrol, sertifikanın varlığını ve temel geçerliliğini test eder.
-                // Not: Bu kısım hata verebilecek sunucular için daha da iyileştirilebilir.
                 var handler = new HttpClientHandler
                 {
                     ServerCertificateCustomValidationCallback = (request, cert, chain, errors) =>
@@ -85,17 +86,38 @@ namespace ApiReputation.Application.Services
 
 
                 // === GENEL SONUÇ DEĞERLENDİRMESİ (BASİT) ===
-                if (result.IsSslValid && result.HasHstsHeader)
+                if (!result.IsSuccessStatusCode)
                 {
-                    result.OverallResult = "Güvenli";
+                    // Eğer istek başarılı değilse (4xx, 5xx hatası varsa), güvenlik kontrollerinin bir önemi kalmaz.
+                    // Öncelikli olarak erişim sorununu bildir.
+                    if (result.HttpStatusCode >= 500)
+                    {
+                        result.OverallResult = $"Sunucu Hatası ({result.HttpStatusCode})";
+                    }
+                    else if (result.HttpStatusCode >= 400)
+                    {
+                        result.OverallResult = $"Erişim Sorunu ({result.HttpStatusCode})";
+                    }
+                    else
+                    {
+                        // Diğer başarısız durum kodları için genel bir mesaj (örn: 3xx yönlendirmeleri)
+                        result.OverallResult = $"Başarısız İstek ({result.HttpStatusCode})";
+                    }
                 }
                 else if (result.IsSslValid == false)
                 {
-                    result.OverallResult = "Yüksek Risk";
+                    // İstek başarılı ama SSL geçersiz. Bu en yüksek risktir.
+                    result.OverallResult = "Yüksek Risk (SSL Geçersiz)";
+                }
+                else if (result.HasHstsHeader == false || result.HasXFrameOptionsHeader == false || result.HasXContentTypeOptionsHeader == false)
+                {
+                    // SSL geçerli ama temel güvenlik başlıklarından en az biri eksik.
+                    result.OverallResult = "Orta Risk (Başlık Eksik)";
                 }
                 else
                 {
-                    result.OverallResult = "Orta Risk";
+                    // Hem istek başarılı, hem SSL geçerli, hem de temel başlıklar tamam.
+                    result.OverallResult = "Güvenli";
                 }
             }
             catch (Exception ex)
@@ -113,8 +135,6 @@ namespace ApiReputation.Application.Services
 
 
         }
-
-
 
     }
 }

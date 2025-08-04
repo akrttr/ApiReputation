@@ -12,8 +12,6 @@ namespace ApiReputation.Domain.Entities
         public int Id { get; set; }
 
         public DateTime ScanDate { get; set; }
-
-        // Hangi taramanın sonucu olduğunu belirtir (Foreign Key)
         public int ApiInfoId { get; set; }
         [ForeignKey("ApiInfoId")]
         public ApiInfo ApiInfo { get; set; }
@@ -26,9 +24,11 @@ namespace ApiReputation.Domain.Entities
         public bool HasXFrameOptionsHeader { get; set; }
         public bool HasXContentTypeOptionsHeader { get; set; }
 
-        public string ServerInfoLeakDetails { get; set; } // Bilgi sızıntısı detayı
+        public string ServerInfoLeakDetails { get; set; } 
 
-        // Gelecekte daha detaylı bir skorlama yapabiliriz.
         public string OverallResult { get; set; }
+        public int ResponseTimeMs { get; set; }
+        public bool IsSuccessStatusCode { get; set; }
+        public int HttpStatusCode { get; set; }
     }
 }
